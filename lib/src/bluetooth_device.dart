@@ -15,33 +15,43 @@ class BluetoothDevice {
         type = BluetoothDeviceType.values[p.type.value];
 
   BehaviorSubject<bool> _isDiscoveringServices = BehaviorSubject.seeded(false);
+
   Stream<bool> get isDiscoveringServices => _isDiscoveringServices.stream;
 
   /// Establishes a connection to the Bluetooth Device.
   Future<void> connect({
     Duration timeout,
     bool autoConnect = true,
-  }) async {
+  }) {
+    final completer = Completer<void>();
     var request = protos.ConnectRequest.create()
       ..remoteId = id.toString()
       ..androidAutoConnect = autoConnect;
 
     Timer timer;
+    StreamSubscription subscription;
     if (timeout != null) {
       timer = Timer(timeout, () {
         disconnect();
-        throw TimeoutException('Failed to connect in time.', timeout);
+        subscription?.cancel();
+        completer.completeError(
+            TimeoutException('Failed to connect in time.', timeout));
       });
     }
 
-    await FlutterBlue.instance._channel
-        .invokeMethod('connect', request.writeToBuffer());
-
-    await state.firstWhere((s) => s == BluetoothDeviceState.connected);
-
-    timer?.cancel();
-
-    return;
+    FlutterBlue.instance._channel
+        .invokeMethod('connect', request.writeToBuffer())
+        .then((value) {
+      subscription = state.listen((s) {
+        if (s == BluetoothDeviceState.connected) {
+          timer?.cancel();
+          completer.complete();
+        }
+      });
+    }, onError: (e) {
+      completer.completeError(e);
+    });
+    return completer.future;
   }
 
   /// Cancels connection to the Bluetooth Device
