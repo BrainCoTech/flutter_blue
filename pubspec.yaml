@@ -16,7 +16,7 @@ dependencies:
   convert: "^2.1.1"
   protobuf:
     git:
-      url: git@github.com:linbiaojj/protobuf.git
+      url: git@github.com:BrainCoTech/protobuf.git
       path: protobuf
   rxdart: "^0.24.0"
 
