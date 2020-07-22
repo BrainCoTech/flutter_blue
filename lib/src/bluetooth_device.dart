@@ -45,6 +45,7 @@ class BluetoothDevice {
       subscription = state.listen((s) {
         if (s == BluetoothDeviceState.connected) {
           timer?.cancel();
+          subscription?.cancel();
           completer.complete();
         }
       });
