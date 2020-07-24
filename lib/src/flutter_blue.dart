@@ -23,10 +23,12 @@ class FlutterBlue {
   }
 
   static FlutterBlue _instance = new FlutterBlue._();
+
   static FlutterBlue get instance => _instance;
 
   /// Log level of the instance, default is all messages (debug).
   LogLevel _logLevel = LogLevel.debug;
+
   LogLevel get logLevel => _logLevel;
 
   /// Checks whether the device supports Bluetooth
@@ -37,10 +39,11 @@ class FlutterBlue {
   Future<bool> get isOn => _channel.invokeMethod('isOn').then<bool>((d) => d);
 
   BehaviorSubject<bool> _isScanning = BehaviorSubject.seeded(false);
+
   Stream<bool> get isScanning => _isScanning.stream;
 
   BehaviorSubject<List<ScanResult>> _scanResults = BehaviorSubject.seeded([]);
-  
+
   /// Returns a stream that is a list of [ScanResult] results while a scan is in progress.
   ///
   /// The list emitted is all the scanned results as of the last initiated scan. When a scan is
@@ -145,12 +148,12 @@ class FlutterBlue {
   }
 
   /// Starts a scan and returns a future that will complete once the scan has finished.
-  /// 
+  ///
   /// Once a scan is started, call [stopScan] to stop the scan and complete the returned future.
   ///
   /// timeout automatically stops the scan after a specified [Duration].
   ///
-  /// To observe the results while the scan is in progress, listen to the [scanResults] stream, 
+  /// To observe the results while the scan is in progress, listen to the [scanResults] stream,
   /// or call [scan] instead.
   Future startScan({
     ScanMode scanMode = ScanMode.lowLatency,
@@ -174,6 +177,18 @@ class FlutterBlue {
     await _channel.invokeMethod('stopScan');
     _stopScanPill.add(null);
     _isScanning.add(false);
+  }
+
+  Future<BondState> getBondState(String id) async {
+    return BondState.values[(await _channel.invokeMethod('getBondState', id) as int) - 10];
+  }
+
+  Future<bool> createBond(String id) async {
+    return await _channel.invokeMethod('createBond', id);
+  }
+
+  Future<bool> removeBond(String id) async {
+    return await FlutterBlue.instance._channel.invokeMethod('removeBond', id);
   }
 
   /// The list of connected peripherals can include those that are connected
@@ -222,8 +237,15 @@ enum BluetoothState {
   off
 }
 
+enum BondState {
+  bondNone,
+  bonding,
+  bonded
+}
+
 class ScanMode {
   const ScanMode(this.value);
+
   static const lowPower = const ScanMode(0);
   static const balanced = const ScanMode(1);
   static const lowLatency = const ScanMode(2);
@@ -233,6 +255,7 @@ class ScanMode {
 
 class DeviceIdentifier {
   final String id;
+
   const DeviceIdentifier(this.id);
 
   @override
