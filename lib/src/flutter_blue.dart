@@ -23,10 +23,12 @@ class FlutterBlue {
   }
 
   static FlutterBlue _instance = new FlutterBlue._();
+
   static FlutterBlue get instance => _instance;
 
   /// Log level of the instance, default is all messages (debug).
   LogLevel _logLevel = LogLevel.debug;
+
   LogLevel get logLevel => _logLevel;
 
   /// Checks whether the device supports Bluetooth
@@ -37,9 +39,11 @@ class FlutterBlue {
   Future<bool> get isOn => _channel.invokeMethod('isOn').then<bool>((d) => d);
 
   BehaviorSubject<bool> _isScanning = BehaviorSubject.seeded(false);
+
   Stream<bool> get isScanning => _isScanning.stream;
 
   BehaviorSubject<List<ScanResult>> _scanResults = BehaviorSubject.seeded([]);
+
   Stream<List<ScanResult>> get scanResults => _scanResults.stream;
 
   PublishSubject _stopScanPill = new PublishSubject();
@@ -156,6 +160,18 @@ class FlutterBlue {
     _isScanning.add(false);
   }
 
+  Future<BondState> getBondState(String id) async {
+    return BondState.values[(await _channel.invokeMethod('getBondState', id) as int) - 10];
+  }
+
+  Future<bool> createBond(String id) async {
+    return await _channel.invokeMethod('createBond', id);
+  }
+
+  Future<bool> removeBond(String id) async {
+    return await FlutterBlue.instance._channel.invokeMethod('removeBond', id);
+  }
+
   /// The list of connected peripherals can include those that are connected
   /// by other apps and that will need to be connected locally using the
   /// device.connect() method before they can be used.
@@ -202,8 +218,15 @@ enum BluetoothState {
   off
 }
 
+enum BondState {
+  bondNone,
+  bonding,
+  bonded
+}
+
 class ScanMode {
   const ScanMode(this.value);
+
   static const lowPower = const ScanMode(0);
   static const balanced = const ScanMode(1);
   static const lowLatency = const ScanMode(2);
@@ -213,6 +236,7 @@ class ScanMode {
 
 class DeviceIdentifier {
   final String id;
+
   const DeviceIdentifier(this.id);
 
   @override
