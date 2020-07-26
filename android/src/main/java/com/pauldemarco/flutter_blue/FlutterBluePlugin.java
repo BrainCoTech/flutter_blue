@@ -322,15 +322,6 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
             case "removeBond": {
                 String deviceId = (String) call.arguments;
                 BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceId);
-                BroadcastReceiver receiver = new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        Log.d("bond", intent.toString());
-                    }
-                };
-                if (application != null) {
-                    application.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED));
-                }
                 try {
                     boolean success = (Boolean) device.getClass().getMethod("removeBond").invoke(device);
                     result.success(success);
