@@ -1,3 +1,6 @@
+## 0.7.4
+* ios 10
+
 ## 0.7.3
 * add bond support
 * fix timeout exception
