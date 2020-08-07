@@ -1,13 +1,13 @@
 name: flutter_blue
-description:
+description: >
   Flutter plugin for connecting and communicating with Bluetooth Low Energy devices,
   on Android and iOS
-version: 0.7.2
-author: Paul DeMarco <paulmdemarco@gmail.com>
-homepage: https://github.com/pauldemarco/flutter_blue
+version: 0.7.3
+homepage: https://github.com/BrainCo/flutter_blue
+publish_to: http://47.111.166.90:8081
 
 environment:
-  sdk: ">=2.0.0-dev.28.0 <3.0.0"
+  sdk: ">=2.3.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.6 <2.0.0"
 
 dependencies:
@@ -15,10 +15,13 @@ dependencies:
     sdk: flutter
   convert: "^2.1.1"
   protobuf:
-    git:
-      url: git@github.com:BrainCoTech/protobuf.git
-      path: protobuf
+    hosted:
+      name: protobuf
+      url: http://47.111.166.90:8081
+    version: ^1.0.1
   rxdart: "^0.24.0"
+  meta: ^1.1.8
+  collection: ^1.14.12
 
 dev_dependencies:
   flutter_test:
@@ -29,5 +32,9 @@ dev_dependencies:
 
 flutter:
   plugin:
-    androidPackage: com.pauldemarco.flutter_blue
-    pluginClass: FlutterBluePlugin
+    platforms:
+      android:
+        package: com.pauldemarco.flutter_blue
+        pluginClass: FlutterBluePlugin
+      ios:
+        pluginClass: FlutterBluePlugin

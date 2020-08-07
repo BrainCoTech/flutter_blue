@@ -1,3 +1,7 @@
+## 0.7.3
+* add bond support
+* fix timeout exception
+
 ## 0.7.2
 * Add `allowDuplicates` option to `startScan`.
 * Fix performance issue with GUID initializers.
