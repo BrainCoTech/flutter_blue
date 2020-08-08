@@ -66,8 +66,8 @@ class BluetoothDevice {
   Future<List<BluetoothService>> discoverServices() async {
     final s = await state.first;
     if (s != BluetoothDeviceState.connected) {
-      return Future.error(new Exception(
-          'Cannot discoverServices while device is not connected. State == $s'));
+      throw new Exception(
+          'Cannot discoverServices while device is not connected. State == $s');
     }
     var response = FlutterBlue.instance._methodStream
         .where((m) => m.method == "DiscoverServicesResult")
@@ -88,7 +88,7 @@ class BluetoothDevice {
 
     _isDiscoveringServices.add(true);
 
-    return response;
+    return await response;
   }
 
   /// Returns a list of Bluetooth GATT services offered by the remote device
