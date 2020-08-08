@@ -1,3 +1,6 @@
+## 0.7.5
+* fix discoverServices
+
 ## 0.7.4
 * ios 10
 
