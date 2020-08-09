@@ -49,8 +49,10 @@ class BluetoothDevice {
           completer.complete();
         }
       });
-    }, onError: (e) {
-      completer.completeError(e);
+    }, onError: (e, st) {
+      timer?.cancel();
+      subscription?.cancel();
+      completer.completeError(e, st);
     });
     return completer.future;
   }

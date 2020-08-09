@@ -1,3 +1,6 @@
+## 0.7.6
+* bug fix
+
 ## 0.7.5
 * fix discoverServices
 
