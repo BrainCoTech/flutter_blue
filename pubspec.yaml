@@ -2,7 +2,7 @@ name: flutter_blue
 description: >
   Flutter plugin for connecting and communicating with Bluetooth Low Energy devices,
   on Android and iOS
-version: 0.7.7
+version: 0.7.8
 homepage: https://github.com/BrainCo/flutter_blue
 publish_to: http://47.111.166.90:8081
 
