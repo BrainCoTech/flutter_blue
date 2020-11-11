@@ -1,3 +1,7 @@
+#
+## 0.8.1
+* merge and publish
+
 ## 0.8.0
 * remove log print
 
