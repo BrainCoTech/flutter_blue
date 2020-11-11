@@ -1,5 +1,5 @@
-## 0.7.8
-* fix null pointer exception
+## 0.8.0
+* remove log print
 
 ## 0.7.6
 * bug fix

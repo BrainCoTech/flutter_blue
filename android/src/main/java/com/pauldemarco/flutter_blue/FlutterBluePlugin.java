@@ -950,9 +950,10 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     }
 
     private void log(LogLevel level, String message) {
-        if (level.ordinal() <= logLevel.ordinal()) {
-            Log.d(TAG, message);
-        }
+        //TODO not work
+//        if (level.ordinal() <= logLevel.ordinal()) {
+//            Log.d(TAG, message);
+//        }
     }
 
     private Handler handler = new Handler(Looper.getMainLooper());
