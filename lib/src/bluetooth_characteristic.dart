@@ -11,6 +11,7 @@ class BluetoothCharacteristic {
   final Guid secondaryServiceUuid;
   final CharacteristicProperties properties;
   final List<BluetoothDescriptor> descriptors;
+
   bool get isNotifying {
     try {
       var cccd =
@@ -22,6 +23,7 @@ class BluetoothCharacteristic {
   }
 
   BehaviorSubject<List<int>> _value;
+
   Stream<List<int>> get value => Rx.merge([
         _value.stream,
         _onValueChangedStream,
@@ -104,7 +106,9 @@ class BluetoothCharacteristic {
   /// guaranteed and will return immediately with success.
   /// [CharacteristicWriteType.withResponse]: the method will return after the
   /// write operation has either passed or failed.
-  Future<Null> write(List<int> value, {bool withoutResponse = false}) async {
+  Future<Null> write(List<int> value,
+      {bool withoutResponse = false,
+      Duration timeout = const Duration(milliseconds: 1000)}) async {
     final type = withoutResponse
         ? CharacteristicWriteType.withoutResponse
         : CharacteristicWriteType.withResponse;
@@ -133,6 +137,7 @@ class BluetoothCharacteristic {
             (p.request.remoteId == request.remoteId) &&
             (p.request.characteristicUuid == request.characteristicUuid) &&
             (p.request.serviceUuid == request.serviceUuid))
+        .timeout(timeout)
         .first
         .then((w) => w.success)
         .then((success) => (!success)

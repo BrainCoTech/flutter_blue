@@ -63,8 +63,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
     private static final String TAG = "FlutterBluePlugin";
     private static FlutterBluePlugin instance;
-    private Object initializationLock = new Object();
-    private Context context;
+    private final Object initializationLock = new Object();
     private MethodChannel channel;
     private static final String NAMESPACE = "plugins.pauldemarco.com/flutter_blue";
 
@@ -72,8 +71,6 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
 
-    private FlutterPluginBinding pluginBinding;
-    private ActivityPluginBinding activityBinding;
     private Application application;
     @Nullable
     private Activity activity;
@@ -81,7 +78,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     static final private UUID CCCD_ID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private final Map<String, BluetoothDeviceCache> mDevices = new HashMap<>();
     private LogLevel logLevel = LogLevel.EMERGENCY;
-    private ArrayList<String> macDeviceScanned = new ArrayList<>();
+    private final ArrayList<String> macDeviceScanned = new ArrayList<>();
     private boolean allowDuplicates = false;
 
     /**
@@ -104,7 +101,6 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        pluginBinding = binding;
         if (instance == null) {
             instance = this;
         }
@@ -114,27 +110,17 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
     @Override
     public void onDetachedFromEngine(FlutterPluginBinding binding) {
-        pluginBinding = null;
         tearDown();
     }
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        activityBinding = binding;
         activity = binding.getActivity();
-//        setup(
-//                pluginBinding.getBinaryMessenger(),
-//                (Application) pluginBinding.getApplicationContext(),
-//                activityBinding.getActivity(),
-//                null,
-//                activityBinding);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        activityBinding = null;
         activity = null;
-//        tearDown();
     }
 
     @Override
@@ -168,13 +154,14 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
     private void tearDown() {
         Log.i(TAG, "teardown " + this);
-        context = null;
         if (channel != null) {
             channel.setMethodCallHandler(null);
             channel = null;
         }
-        stateChannel.setStreamHandler(null);
-        stateChannel = null;
+        if (stateChannel != null) {
+            stateChannel.setStreamHandler(null);
+            stateChannel = null;
+        }
         mBluetoothAdapter = null;
         mBluetoothManager = null;
         application = null;
@@ -183,19 +170,18 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
+        if ("setLogLevel".equals(call.method)) {
+            int logLevelIndex = (int) call.arguments;
+            logLevel = LogLevel.values()[logLevelIndex];
+            result.success(null);
+            return;
+        }
         if (mBluetoothAdapter == null && !"isAvailable".equals(call.method)) {
             result.error("bluetooth_unavailable", "the device does not have bluetooth", null);
             return;
         }
 
         switch (call.method) {
-            case "setLogLevel": {
-                int logLevelIndex = (int) call.arguments;
-                logLevel = LogLevel.values()[logLevelIndex];
-                result.success(null);
-                break;
-            }
-
             case "state": {
                 Protos.BluetoothState.Builder p = Protos.BluetoothState.newBuilder();
                 try {
