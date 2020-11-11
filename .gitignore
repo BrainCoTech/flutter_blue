@@ -11,3 +11,4 @@ build/
 .idea/
 .vscode/
 skipoauth.dart.snapshot
+skipoauth.snapshot
