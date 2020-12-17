@@ -1,4 +1,8 @@
 #
+
+## 0.8.2
+* discoverServices add timeout parameter
+
 ## 0.8.1
 * merge and publish
 

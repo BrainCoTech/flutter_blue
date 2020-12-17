@@ -65,7 +65,8 @@ class BluetoothDevice {
       BehaviorSubject.seeded([]);
 
   /// Discovers services offered by the remote device as well as their characteristics and descriptors
-  Future<List<BluetoothService>> discoverServices() async {
+  Future<List<BluetoothService>> discoverServices(
+      {Duration timeout = const Duration(seconds: 3)}) async {
     final s = await state.first;
     if (s != BluetoothDeviceState.connected) {
       throw new Exception(
@@ -79,6 +80,7 @@ class BluetoothDevice {
         .map((p) => p.services)
         .map((s) => s.map((p) => new BluetoothService.fromProto(p)).toList())
         .first
+        .timeout(timeout)
         .then((list) {
       _services.add(list);
       _isDiscoveringServices.add(false);
